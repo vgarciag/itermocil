@@ -34,7 +34,7 @@ class Itermocil(object):
         else:
             # Temporary check to check for unsupported version of iTerm beta
             v = self.get_version_string()
-            bits = v.split('.')
+            bits = v.split('.'.encode())
             if len(bits) > 2 and '-nightly' in str(major_version):
                 build = bits[2].replace('-nightly', '')
                 if (int(build) < 20150805):
@@ -50,7 +50,7 @@ class Itermocil(object):
 
         # Open up the file and parse it with PyYaml
         with open(self.file, 'r') as f:
-            self.parsed_config = yaml.load(f)
+            self.parsed_config = yaml.load(f,Loader=yaml.FullLoader)
 
         # This will be where we build up the script.
         self.applescript = []
@@ -90,7 +90,7 @@ class Itermocil(object):
                                stdout=subprocess.PIPE)
 
         version_script = 'set iterm_version to (get version of application "iTerm")'
-        v = osa.communicate(version_script)[0]
+        v = osa.communicate(version_script.encode())[0]
 
         return v.strip()
 
@@ -120,7 +120,7 @@ class Itermocil(object):
                                count sessions of current terminal
                            end tell
                        """
-        num = osa.communicate(panes_script)[0]
+        num = osa.communicate(panes_script.encode())[0]
 
         return num.strip()
 
@@ -134,7 +134,7 @@ class Itermocil(object):
                                stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE)
 
-        return osa.communicate(parsed_script)[0]
+        return osa.communicate(parsed_script.encode())[0]
 
     def script(self):
         """ Return the Applescript we have built (so far). Mainly for
@@ -232,7 +232,7 @@ class Itermocil(object):
         # spans two columns. Panes are numbered top to bottom, left to right.
         elif layout == 'tiled':
 
-            vertical_splits = int(ceil((num_panes / 2.0))) - 1
+            vertical_splits = int(((num_panes / 2.0))) - 1
             second_columns = num_panes / 2
 
             for p in range(0, vertical_splits):
